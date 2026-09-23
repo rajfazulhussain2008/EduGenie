@@ -218,22 +218,23 @@ function initForms() {
   }
 }
 
-// 5. Output rendering with Copy button
+// 5. Output rendering with Markdown support and Copy button
 function renderOutput(container, text, title) {
   container.className = "output-container has-content";
+  const formattedHtml = formatMarkdown(text);
   container.innerHTML = `
     <div class="output-header">
       <div class="output-title">📄 ${escapeHtml(title)}</div>
-      <button class="btn-copy" onclick="copyContent(this)">📋 Copy</button>
+      <button class="btn-copy" onclick="copyRawContent(this)" data-raw="${encodeURIComponent(text)}">📋 Copy</button>
     </div>
-    <div class="output-content">${escapeHtml(text)}</div>
+    <div class="output-content formatted-markdown">${formattedHtml}</div>
   `;
 }
 
 // 6. Markdown-styled Output rendering
 function renderMarkdownOutput(container, markdownText, title) {
   container.className = "output-container has-content";
-  const formattedHtml = parseSimpleMarkdown(markdownText);
+  const formattedHtml = formatMarkdown(markdownText);
   container.innerHTML = `
     <div class="output-header">
       <div class="output-title">🗺️ ${escapeHtml(title)}</div>
@@ -369,6 +370,23 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function formatMarkdown(text) {
+  if (!text) return "";
+
+  // Clean up LaTeX formatting like $$\text{username@domain.com}$$ into code/box
+  let cleaned = text.replace(/\$\$\\text\{([^}]+)\}\$\$/g, '`$1`');
+  cleaned = cleaned.replace(/\$\$([^$]+)\$\$/g, '`$1`');
+
+  if (typeof marked !== "undefined" && typeof marked.parse === "function") {
+    try {
+      return marked.parse(cleaned);
+    } catch (err) {
+      console.warn("marked.parse error, falling back:", err);
+    }
+  }
+  return parseSimpleMarkdown(cleaned);
 }
 
 function parseSimpleMarkdown(md) {

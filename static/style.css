@@ -435,23 +435,90 @@ body {
 }
 
 /* Markdown formatted view */
-.formatted-markdown h1, .formatted-markdown h2, .formatted-markdown h3 {
-  color: #0f172a;
-  margin-top: 16px;
-  margin-bottom: 8px;
-  font-weight: 700;
+.formatted-markdown {
+  white-space: normal;
+  color: #1e293b;
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
-.formatted-markdown h2 { font-size: 1.25rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
-.formatted-markdown h3 { font-size: 1.05rem; }
+.formatted-markdown p {
+  margin-bottom: 14px;
+}
 
-.formatted-markdown ul, .formatted-markdown ol {
+.formatted-markdown h1, 
+.formatted-markdown h2, 
+.formatted-markdown h3, 
+.formatted-markdown h4 {
+  color: #0f172a;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.formatted-markdown h1 { font-size: 1.45rem; }
+.formatted-markdown h2 { font-size: 1.25rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; }
+.formatted-markdown h3 { font-size: 1.1rem; color: #1e40af; }
+.formatted-markdown h4 { font-size: 1rem; }
+
+.formatted-markdown hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 18px 0;
+}
+
+.formatted-markdown ul, 
+.formatted-markdown ol {
   padding-left: 24px;
-  margin: 10px 0;
+  margin: 12px 0 16px;
 }
 
 .formatted-markdown li {
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.formatted-markdown strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.formatted-markdown code {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.formatted-markdown pre {
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 14px 0;
+}
+
+.formatted-markdown pre code {
+  background: transparent;
+  border: none;
+  color: inherit;
+  padding: 0;
+}
+
+.formatted-markdown blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 14px;
+  margin: 14px 0;
+  color: #475569;
+  font-style: italic;
+  background: #f8fafc;
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 
 /* Interactive Quiz Styles */
