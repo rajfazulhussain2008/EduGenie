@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduGenie — AI-Powered Learning Assistant</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Hero Header -->
+  <header class="header-hero">
+    <div class="header-content">
+      <div class="badge-pill">
+        <span class="status-dot"></span>
+        <span id="statusText">Checking AI Services...</span>
+      </div>
+      <h1 class="header-title">Welcome to EduGenie 🧠✨</h1>
+      <p class="header-subtitle">Your personal AI tutor powered by Google Gemini 1.5 Pro and local machine intelligence for seamless, accessible learning support.</p>
+      
+      <!-- Module Filter / Navigation Bar -->
+      <nav class="nav-pills-container">
+        <button type="button" class="nav-pill-btn active" data-target="all">🌟 All Features</button>
+        <button type="button" class="nav-pill-btn" data-target="section-qa">💡 Ask Questions</button>
+        <button type="button" class="nav-pill-btn" data-target="section-explain">🔬 Concept Explainer</button>
+        <button type="button" class="nav-pill-btn" data-target="section-summary">📝 Summarizer</button>
+        <button type="button" class="nav-pill-btn" data-target="section-quiz">🎯 Quiz Generator</button>
+        <button type="button" class="nav-pill-btn" data-target="section-path">🗺️ Learning Roadmap</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Dashboard -->
+  <main class="main-container">
+
+    <!-- 1. Q&A Module -->
+    <section class="feature-card" id="section-qa">
+      <div class="card-header-bar">
+        <div class="card-title-group">
+          <div class="card-icon qna-icon">💡</div>
+          <div class="card-title-text">
+            <h2>Ask EduGenie a Question</h2>
+            <p>Get smart, precise, and concise answers to any academic query.</p>
+          </div>
+        </div>
+        <span class="model-badge badge-gemini">Gemini 1.5 Pro</span>
+      </div>
+      <div class="card-body">
+        <form id="qaForm">
+          <div class="form-group">
+            <label class="form-label" for="question">What would you like to know?</label>
+            <div class="input-container">
+              <input type="text" class="text-input" id="question" name="question" placeholder="e.g., Which is the largest ocean on Earth?" required>
+              <button type="submit" class="btn-submit">Get Answer</button>
+            </div>
+            <div class="quick-chips">
+              <span class="quick-chips-label">Try asking:</span>
+              <button type="button" class="chip" data-input="question" data-text="Which is the largest ocean on Earth?">Largest ocean?</button>
+              <button type="button" class="chip" data-input="question" data-text="Why does iron rust in moist air?">Why does iron rust?</button>
+              <button type="button" class="chip" data-input="question" data-text="What is the difference between mitosis and meiosis?">Mitosis vs Meiosis</button>
+            </div>
+          </div>
+        </form>
+        <div id="qaResult" class="output-container"></div>
+      </div>
+    </section>
+
+    <!-- 2. Concept Explainer Module (Local Model) -->
+    <section class="feature-card" id="section-explain">
+      <div class="card-header-bar">
+        <div class="card-title-group">
+          <div class="card-icon explain-icon">🔬</div>
+          <div class="card-title-text">
+            <h2>Need an Explanation?</h2>
+            <p>Simplifies complex scientific, mathematical, or literary topics for students.</p>
+          </div>
+        </div>
+        <span class="model-badge badge-local">Local LaMini-Flan-T5</span>
+      </div>
+      <div class="card-body">
+        <form id="explainForm">
+          <div class="form-group">
+            <label class="form-label" for="topic">Topic or concept to simplify:</label>
+            <div class="input-container">
+              <input type="text" class="text-input" id="topic" name="topic" placeholder="e.g., Photosynthesis" required>
+              <button type="submit" class="btn-submit">Explain Concept</button>
+            </div>
+            <div class="quick-chips">
+              <span class="quick-chips-label">Try topics:</span>
+              <button type="button" class="chip" data-input="topic" data-text="Photosynthesis">Photosynthesis</button>
+              <button type="button" class="chip" data-input="topic" data-text="Gravity">Gravity</button>
+              <button type="button" class="chip" data-input="topic" data-text="Pythagoras Theorem">Pythagoras Theorem</button>
+              <button type="button" class="chip" data-input="topic" data-text="Black Holes">Black Holes</button>
+            </div>
+          </div>
+        </form>
+        <div id="explanationResult" class="output-container"></div>
+      </div>
+    </section>
+
+    <!-- 3. Summarization Module -->
+    <section class="feature-card" id="section-summary">
+      <div class="card-header-bar">
+        <div class="card-title-group">
+          <div class="card-icon summary-icon">📝</div>
+          <div class="card-title-text">
+            <h2>Summarize a Paragraph</h2>
+            <p>Condense lengthy textbook passages or essays into high-impact revision notes.</p>
+          </div>
+        </div>
+        <span class="model-badge badge-gemini">Gemini 1.5 Pro</span>
+      </div>
+      <div class="card-body">
+        <form id="summaryForm">
+          <div class="form-group">
+            <label class="form-label" for="summaryText">Educational passage to condense:</label>
+            <textarea class="textarea-input" id="summaryText" name="summaryText" placeholder="Paste textbook excerpt, lecture notes, or history passage here..." required></textarea>
+            <div class="quick-chips">
+              <span class="quick-chips-label">Sample passage:</span>
+              <button type="button" class="chip" data-input="summaryText" data-text="The Industrial Revolution, which began in the late 18th century in Great Britain, marked a major turning point in history. It shifted agrarian, handicraft economies into modern economies dominated by industry and machine manufacturing. Technological innovations such as James Watt's improved steam engine drastically transformed production, transportation, and societal structures.">Industrial Revolution</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit">Summarize Paragraph</button>
+        </form>
+        <div id="summaryResult" class="output-container"></div>
+      </div>
+    </section>
+
+    <!-- 4. Interactive Quiz Generator Module -->
+    <section class="feature-card" id="section-quiz">
+      <div class="card-header-bar">
+        <div class="card-title-group">
+          <div class="card-icon quiz-icon">🎯</div>
+          <div class="card-title-text">
+            <h2>Generate an Interactive Quiz</h2>
+            <p>Creates 3 multiple-choice questions with 4 options and real-time self-checking.</p>
+          </div>
+        </div>
+        <span class="model-badge badge-gemini">Gemini 1.5 Pro</span>
+      </div>
+      <div class="card-body">
+        <form id="quizForm">
+          <div class="form-group">
+            <label class="form-label" for="quizText">Subject or passage for the quiz:</label>
+            <div class="input-container">
+              <input type="text" class="text-input" id="quizText" name="quizText" placeholder="e.g., Solar System or Pythagoras Theorem" required>
+              <button type="submit" class="btn-submit">Generate Quiz</button>
+            </div>
+            <div class="quick-chips">
+              <span class="quick-chips-label">Try subjects:</span>
+              <button type="button" class="chip" data-input="quizText" data-text="Solar System">Solar System</button>
+              <button type="button" class="chip" data-input="quizText" data-text="Pythagoras Theorem">Pythagoras Theorem</button>
+              <button type="button" class="chip" data-input="quizText" data-text="Periodic Table">Periodic Table</button>
+            </div>
+          </div>
+        </form>
+        <div id="quizResult" class="output-container"></div>
+      </div>
+    </section>
+
+    <!-- 5. Learning Recommendations Roadmap Module -->
+    <section class="feature-card" id="section-path">
+      <div class="card-header-bar">
+        <div class="card-title-group">
+          <div class="card-icon path-icon">🗺️</div>
+          <div class="card-title-text">
+            <h2>Personalized Learning Roadmap</h2>
+            <p>Adaptive curriculum from beginner to advanced with curated study resources.</p>
+          </div>
+        </div>
+        <span class="model-badge badge-gemini">Gemini 1.5 Pro</span>
+      </div>
+      <div class="card-body">
+        <form id="pathForm">
+          <div class="form-group">
+            <label class="form-label" for="pathTopic">Topic or discipline you want to master:</label>
+            <div class="input-container">
+              <input type="text" class="text-input" id="pathTopic" name="pathTopic" placeholder="e.g., SQL or Machine Learning" required>
+              <button type="submit" class="btn-submit">Get Learning Path</button>
+            </div>
+            <div class="quick-chips">
+              <span class="quick-chips-label">Explore paths:</span>
+              <button type="button" class="chip" data-input="pathTopic" data-text="SQL">SQL</button>
+              <button type="button" class="chip" data-input="pathTopic" data-text="Linear Regression">Linear Regression</button>
+              <button type="button" class="chip" data-input="pathTopic" data-text="Data Structures and Algorithms">Data Structures &amp; Algorithms</button>
+            </div>
+          </div>
+        </form>
+        <div id="pathResult" class="output-container"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <p>EduGenie &bull; AI-Powered Learning Assistant &bull; FastAPI &amp; Google Gemini &bull; Built for Students &amp; Educators</p>
+  </footer>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
