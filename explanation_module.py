@@ -22,9 +22,10 @@ def get_model_and_tokenizer():
 
     _model_load_attempted = True
     try:
-        print(f"Loading local model '{LOCAL_MODEL_NAME}'...")
-        tokenizer = AutoTokenizer.from_pretrained(LOCAL_MODEL_NAME)
-        model = AutoModelForSeq2SeqLM.from_pretrained(LOCAL_MODEL_NAME)
+        cache_dir = os.getenv("HF_HOME", "D:/.hf_cache")
+        print(f"Loading local model '{LOCAL_MODEL_NAME}' from cache: {cache_dir}...")
+        tokenizer = AutoTokenizer.from_pretrained(LOCAL_MODEL_NAME, cache_dir=cache_dir)
+        model = AutoModelForSeq2SeqLM.from_pretrained(LOCAL_MODEL_NAME, cache_dir=cache_dir)
         device = "cuda" if torch.cuda.is_available() else ("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
         model = model.to(device)
         explain_tokenizer = tokenizer
