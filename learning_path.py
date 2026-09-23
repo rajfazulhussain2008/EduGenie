@@ -35,7 +35,10 @@ Suggest a structured and adaptive learning path including key topics, order of l
 Include beginner, intermediate, and advanced levels if needed.
 """
         response = model.generate_content(prompt)
-        print("🧠 Gemini raw response:", response)
+        try:
+            print("[Gemini raw response received]")
+        except Exception:
+            pass
 
         if hasattr(response, "text") and response.text:
             return response.text.strip()
