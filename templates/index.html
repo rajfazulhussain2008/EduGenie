@@ -19,7 +19,7 @@
         <span id="statusText">Checking AI Services...</span>
       </div>
       <h1 class="header-title">Welcome to EduGenie 🧠✨</h1>
-      <p class="header-subtitle">Your personal AI tutor powered by Google Gemini 1.5 Pro and local machine intelligence for seamless, accessible learning support.</p>
+      <p class="header-subtitle">Your personal AI tutor powered by Google Gemini and local machine intelligence for seamless, accessible learning support.</p>
       
       <!-- Module Filter / Navigation Bar -->
       <nav class="nav-pills-container">
@@ -46,15 +46,15 @@
             <p>Get smart, precise, and concise answers to any academic query.</p>
           </div>
         </div>
-        <span class="model-badge badge-gemini">Gemini 1.5 Pro</span>
+        <span class="model-badge badge-gemini">Gemini</span>
       </div>
       <div class="card-body">
-        <form id="qaForm">
+        <form id="qaForm" onsubmit="handleQaSubmit(event); return false;">
           <div class="form-group">
             <label class="form-label" for="question">What would you like to know?</label>
             <div class="input-container">
               <input type="text" class="text-input" id="question" name="question" placeholder="e.g., Which is the largest ocean on Earth?" required>
-              <button type="submit" class="btn-submit">Get Answer</button>
+              <button type="button" class="btn-submit" onclick="handleQaSubmit(event)">Get Answer</button>
             </div>
             <div class="quick-chips">
               <span class="quick-chips-label">Try asking:</span>
@@ -81,12 +81,12 @@
         <span class="model-badge badge-local">Local LaMini-Flan-T5</span>
       </div>
       <div class="card-body">
-        <form id="explainForm">
+        <form id="explainForm" onsubmit="handleExplainSubmit(event); return false;">
           <div class="form-group">
             <label class="form-label" for="topic">Topic or concept to simplify:</label>
             <div class="input-container">
               <input type="text" class="text-input" id="topic" name="topic" placeholder="e.g., Photosynthesis" required>
-              <button type="submit" class="btn-submit">Explain Concept</button>
+              <button type="button" class="btn-submit" onclick="handleExplainSubmit(event)">Explain Concept</button>
             </div>
             <div class="quick-chips">
               <span class="quick-chips-label">Try topics:</span>
@@ -111,10 +111,10 @@
             <p>Condense lengthy textbook passages or essays into high-impact revision notes.</p>
           </div>
         </div>
-        <span class="model-badge badge-gemini">Gemini 1.5 Pro</span>
+        <span class="model-badge badge-gemini">Gemini</span>
       </div>
       <div class="card-body">
-        <form id="summaryForm">
+        <form id="summaryForm" onsubmit="handleSummarySubmit(event); return false;">
           <div class="form-group">
             <label class="form-label" for="summaryText">Educational passage to condense:</label>
             <textarea class="textarea-input" id="summaryText" name="summaryText" placeholder="Paste textbook excerpt, lecture notes, or history passage here..." required></textarea>
@@ -123,7 +123,7 @@
               <button type="button" class="chip" data-input="summaryText" data-text="The Industrial Revolution, which began in the late 18th century in Great Britain, marked a major turning point in history. It shifted agrarian, handicraft economies into modern economies dominated by industry and machine manufacturing. Technological innovations such as James Watt's improved steam engine drastically transformed production, transportation, and societal structures.">Industrial Revolution</button>
             </div>
           </div>
-          <button type="submit" class="btn-submit">Summarize Paragraph</button>
+          <button type="button" class="btn-submit" onclick="handleSummarySubmit(event)">Summarize Paragraph</button>
         </form>
         <div id="summaryResult" class="output-container"></div>
       </div>
@@ -139,15 +139,15 @@
             <p>Creates 3 multiple-choice questions with 4 options and real-time self-checking.</p>
           </div>
         </div>
-        <span class="model-badge badge-gemini">Gemini 1.5 Pro</span>
+        <span class="model-badge badge-gemini">Gemini</span>
       </div>
       <div class="card-body">
-        <form id="quizForm">
+        <form id="quizForm" onsubmit="handleQuizSubmit(event); return false;">
           <div class="form-group">
             <label class="form-label" for="quizText">Subject or passage for the quiz:</label>
             <div class="input-container">
               <input type="text" class="text-input" id="quizText" name="quizText" placeholder="e.g., Solar System or Pythagoras Theorem" required>
-              <button type="submit" class="btn-submit">Generate Quiz</button>
+              <button type="button" class="btn-submit" onclick="handleQuizSubmit(event)">Generate Quiz</button>
             </div>
             <div class="quick-chips">
               <span class="quick-chips-label">Try subjects:</span>
@@ -171,15 +171,15 @@
             <p>Adaptive curriculum from beginner to advanced with curated study resources.</p>
           </div>
         </div>
-        <span class="model-badge badge-gemini">Gemini 1.5 Pro</span>
+        <span class="model-badge badge-gemini">Gemini</span>
       </div>
       <div class="card-body">
-        <form id="pathForm">
+        <form id="pathForm" onsubmit="handlePathSubmit(event); return false;">
           <div class="form-group">
             <label class="form-label" for="pathTopic">Topic or discipline you want to master:</label>
             <div class="input-container">
               <input type="text" class="text-input" id="pathTopic" name="pathTopic" placeholder="e.g., SQL or Machine Learning" required>
-              <button type="submit" class="btn-submit">Get Learning Path</button>
+              <button type="button" class="btn-submit" onclick="handlePathSubmit(event)">Get Learning Path</button>
             </div>
             <div class="quick-chips">
               <span class="quick-chips-label">Explore paths:</span>
@@ -202,16 +202,39 @@
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    /**
-     * EduGenie Frontend Controller
-     * Handles async form dispatches, interactive quiz checking, formatting, and live status.
-     */
     document.addEventListener("DOMContentLoaded", () => {
       initHealthCheck();
       initQuickChips();
-      initForms();
       initNavFilters();
+      checkUrlParams();
     });
+
+    // Auto-detect and trigger if URL contains query params
+    function checkUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get("question");
+      const t = params.get("topic");
+      const s = params.get("summaryText") || params.get("text");
+      const quiz = params.get("quizText");
+      const p = params.get("pathTopic");
+
+      if (q) {
+        const input = document.getElementById("question");
+        if (input) { input.value = q; window.handleQaSubmit(); }
+      } else if (t) {
+        const input = document.getElementById("topic");
+        if (input) { input.value = t; window.handleExplainSubmit(); }
+      } else if (s) {
+        const input = document.getElementById("summaryText");
+        if (input) { input.value = s; window.handleSummarySubmit(); }
+      } else if (quiz) {
+        const input = document.getElementById("quizText");
+        if (input) { input.value = quiz; window.handleQuizSubmit(); }
+      } else if (p) {
+        const input = document.getElementById("pathTopic");
+        if (input) { input.value = p; window.handlePathSubmit(); }
+      }
+    }
 
     // 1. Health check to display live status
     async function initHealthCheck() {
@@ -273,153 +296,136 @@
       });
     }
 
-    // 4. Form Submissions
-    function initForms() {
-      // Q&A Form
-      const qaForm = document.getElementById("qaForm");
-      if (qaForm) {
-        qaForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const input = document.getElementById("question");
-          const val = input.value.trim();
-          if (!val) return;
+    // 4. Form Action Handlers (Bulletproof against native reload)
+    window.handleQaSubmit = async function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const input = document.getElementById("question");
+      const val = input ? input.value.trim() : "";
+      if (!val) return false;
 
-          const btn = qaForm.querySelector('button[type="submit"]');
-          const resultBox = document.getElementById("qaResult");
-          setLoading(btn, true);
+      const btn = document.querySelector("#qaForm .btn-submit");
+      const resultBox = document.getElementById("qaResult");
+      setLoading(btn, true);
 
-          try {
-            const res = await fetch(`/qa?question=${encodeURIComponent(val)}`);
-            const data = await res.json();
-            const content = data.answer || data.error || "No response received.";
-            renderOutput(resultBox, content, "Answer");
-          } catch (err) {
-            renderOutput(resultBox, `⚠️ Network error: ${err.message}`, "Error");
-          } finally {
-            setLoading(btn, false);
-          }
-        });
+      try {
+        const res = await fetch(`/qa?question=${encodeURIComponent(val)}`);
+        const data = await res.json();
+        const content = data.answer || data.error || "No response received.";
+        renderOutput(resultBox, content, "Answer");
+      } catch (err) {
+        renderOutput(resultBox, `⚠️ Network error: ${err.message}`, "Error");
+      } finally {
+        setLoading(btn, false);
       }
+      return false;
+    };
 
-      // Explanation Form
-      const explainForm = document.getElementById("explainForm");
-      if (explainForm) {
-        explainForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const input = document.getElementById("topic");
-          const val = input.value.trim();
-          if (!val) return;
+    window.handleExplainSubmit = async function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const input = document.getElementById("topic");
+      const val = input ? input.value.trim() : "";
+      if (!val) return false;
 
-          const btn = explainForm.querySelector('button[type="submit"]');
-          const resultBox = document.getElementById("explanationResult");
-          setLoading(btn, true);
+      const btn = document.querySelector("#explainForm .btn-submit");
+      const resultBox = document.getElementById("explanationResult");
+      setLoading(btn, true);
 
-          try {
-            const res = await fetch("/explain/", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ topic: val }),
-            });
-            const data = await res.json();
-            const content = data.explanation || data.error || "No explanation received.";
-            renderOutput(resultBox, content, `Explanation for "${data.topic || val}"`);
-          } catch (err) {
-            renderOutput(resultBox, `⚠️ Network error: ${err.message}`, "Error");
-          } finally {
-            setLoading(btn, false);
-          }
+      try {
+        const res = await fetch("/explain/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topic: val }),
         });
+        const data = await res.json();
+        const content = data.explanation || data.error || "No explanation received.";
+        renderOutput(resultBox, content, `Explanation for "${data.topic || val}"`);
+      } catch (err) {
+        renderOutput(resultBox, `⚠️ Network error: ${err.message}`, "Error");
+      } finally {
+        setLoading(btn, false);
       }
+      return false;
+    };
 
-      // Summary Form
-      const summaryForm = document.getElementById("summaryForm");
-      if (summaryForm) {
-        summaryForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const input = document.getElementById("summaryText");
-          const val = input.value.trim();
-          if (!val) return;
+    window.handleSummarySubmit = async function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const input = document.getElementById("summaryText");
+      const val = input ? input.value.trim() : "";
+      if (!val) return false;
 
-          const btn = summaryForm.querySelector('button[type="submit"]');
-          const resultBox = document.getElementById("summaryResult");
-          setLoading(btn, true);
+      const btn = document.querySelector("#summaryForm .btn-submit");
+      const resultBox = document.getElementById("summaryResult");
+      setLoading(btn, true);
 
-          try {
-            const res = await fetch("/summarize/", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ text: val }),
-            });
-            const data = await res.json();
-            const content = data.summary || data.error || "No summary generated.";
-            renderOutput(resultBox, content, "Summary");
-          } catch (err) {
-            renderOutput(resultBox, `⚠️ Network error: ${err.message}`, "Error");
-          } finally {
-            setLoading(btn, false);
-          }
+      try {
+        const res = await fetch("/summarize/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: val }),
         });
+        const data = await res.json();
+        const content = data.summary || data.error || "No summary generated.";
+        renderOutput(resultBox, content, "Summary");
+      } catch (err) {
+        renderOutput(resultBox, `⚠️ Network error: ${err.message}`, "Error");
+      } finally {
+        setLoading(btn, false);
       }
+      return false;
+    };
 
-      // Quiz Form
-      const quizForm = document.getElementById("quizForm");
-      if (quizForm) {
-        quizForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const input = document.getElementById("quizText");
-          const val = input.value.trim();
-          if (!val) return;
+    window.handleQuizSubmit = async function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const input = document.getElementById("quizText");
+      const val = input ? input.value.trim() : "";
+      if (!val) return false;
 
-          const btn = quizForm.querySelector('button[type="submit"]');
-          const resultBox = document.getElementById("quizResult");
-          setLoading(btn, true);
+      const btn = document.querySelector("#quizForm .btn-submit");
+      const resultBox = document.getElementById("quizResult");
+      setLoading(btn, true);
 
-          try {
-            const res = await fetch("/quiz", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ text: val }),
-            });
-            const data = await res.json();
-            if (data.quiz && Array.isArray(data.quiz)) {
-              renderInteractiveQuiz(resultBox, data.quiz);
-            } else {
-              renderOutput(resultBox, JSON.stringify(data), "Quiz Response");
-            }
-          } catch (err) {
-            renderOutput(resultBox, `⚠️ Network error: ${err.message}`, "Error");
-          } finally {
-            setLoading(btn, false);
-          }
+      try {
+        const res = await fetch("/quiz", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: val }),
         });
+        const data = await res.json();
+        if (data.quiz && Array.isArray(data.quiz)) {
+          renderInteractiveQuiz(resultBox, data.quiz);
+        } else {
+          renderOutput(resultBox, JSON.stringify(data), "Quiz Response");
+        }
+      } catch (err) {
+        renderOutput(resultBox, `⚠️ Network error: ${err.message}`, "Error");
+      } finally {
+        setLoading(btn, false);
       }
+      return false;
+    };
 
-      // Learning Recommendations Form
-      const pathForm = document.getElementById("pathForm");
-      if (pathForm) {
-        pathForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const input = document.getElementById("pathTopic");
-          const val = input.value.trim();
-          if (!val) return;
+    window.handlePathSubmit = async function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const input = document.getElementById("pathTopic");
+      const val = input ? input.value.trim() : "";
+      if (!val) return false;
 
-          const btn = pathForm.querySelector('button[type="submit"]');
-          const resultBox = document.getElementById("pathResult");
-          setLoading(btn, true);
+      const btn = document.querySelector("#pathForm .btn-submit");
+      const resultBox = document.getElementById("pathResult");
+      setLoading(btn, true);
 
-          try {
-            const res = await fetch(`/learn/recommendations?topic=${encodeURIComponent(val)}`);
-            const data = await res.json();
-            const content = data.recommendation || data.error || "No recommendations generated.";
-            renderMarkdownOutput(resultBox, content, `Learning Roadmap: ${data.topic || val}`);
-          } catch (err) {
-            renderOutput(resultBox, `⚠️ Network error: ${err.message}`, "Error");
-          } finally {
-            setLoading(btn, false);
-          }
-        });
+      try {
+        const res = await fetch(`/learn/recommendations?topic=${encodeURIComponent(val)}`);
+        const data = await res.json();
+        const content = data.recommendation || data.error || "No recommendations generated.";
+        renderMarkdownOutput(resultBox, content, `Learning Roadmap: ${data.topic || val}`);
+      } catch (err) {
+        renderOutput(resultBox, `⚠️ Network error: ${err.message}`, "Error");
+      } finally {
+        setLoading(btn, false);
       }
-    }
+      return false;
+    };
 
     // 5. Output rendering with Markdown support and Copy button
     function renderOutput(container, text, title) {
@@ -428,7 +434,7 @@
       container.innerHTML = `
         <div class="output-header">
           <div class="output-title">📄 ${escapeHtml(title)}</div>
-          <button class="btn-copy" onclick="copyRawContent(this)" data-raw="${encodeURIComponent(text)}">📋 Copy</button>
+          <button class="btn-copy" type="button" onclick="copyRawContent(this)" data-raw="${encodeURIComponent(text)}">📋 Copy</button>
         </div>
         <div class="output-content formatted-markdown">${formattedHtml}</div>
       `;
@@ -441,7 +447,7 @@
       container.innerHTML = `
         <div class="output-header">
           <div class="output-title">🗺️ ${escapeHtml(title)}</div>
-          <button class="btn-copy" onclick="copyRawContent(this)" data-raw="${encodeURIComponent(markdownText)}">📋 Copy Roadmap</button>
+          <button class="btn-copy" type="button" onclick="copyRawContent(this)" data-raw="${encodeURIComponent(markdownText)}">📋 Copy Roadmap</button>
         </div>
         <div class="output-content formatted-markdown">${formattedHtml}</div>
       `;
@@ -552,6 +558,7 @@
 
     // 9. Helper Utilities
     function setLoading(btn, isLoading) {
+      if (!btn) return;
       if (isLoading) {
         btn.disabled = true;
         btn.dataset.originalText = btn.innerHTML;
@@ -615,7 +622,7 @@
       const raw = btn.getAttribute("data-raw");
       if (raw) {
         navigator.clipboard.writeText(decodeURIComponent(raw)).then(() => {
-          showToast("Copied to clipboard!");
+          showToast("Roadmap copied to clipboard!");
         });
       }
     };
