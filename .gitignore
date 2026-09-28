@@ -11,3 +11,5 @@ extracted_doc_text.txt
 .~lock.*#
 ~$*.docx
 *.docx
+*.mp4
+*.webm
