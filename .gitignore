@@ -10,3 +10,4 @@ extracted_doc_text.txt
 .pytest_cache/
 .~lock.*#
 ~$*.docx
+*.docx
