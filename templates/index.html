@@ -575,8 +575,8 @@
     function formatMarkdown(text) {
       if (!text) return "";
 
-      let cleaned = text.replace(/\\$\\$\\text\\{([^}]+)\\}\\$\\$/g, '`$1`');
-      cleaned = cleaned.replace(/\\$\\$([^$]+)\\$\\$/g, '`$1`');
+      let cleaned = text.replace(/\$\$\\text\{([^}]+)\}\$\$/g, '`$1`');
+      cleaned = cleaned.replace(/\$\$([^$]+)\$\$/g, '`$1`');
 
       if (typeof marked !== "undefined" && typeof marked.parse === "function") {
         try {
@@ -592,13 +592,12 @@
       if (!md) return "";
       let html = escapeHtml(md);
 
-      html = html.replace(/\\*\\*(.*?)\\*\\*/g, "<strong>$1</strong>");
-      html = html.replace(/^### (.*$)/gim, "<h3>$1</h3>");
-      html = html.replace(/^## (.*$)/gim, "<h2>$1</h2>");
-      html = html.replace(/^# (.*$)/gim, "<h1>$1</h1>");
-      html = html.replace(/^\\s*[\\*\\-]\\s+(.*$)/gim, "<li>$1</li>");
-      html = html.replace(/(<li>.*<\\/li>)/gims, "<ul>$1</ul>");
-      html = html.replace(/\\n\\n+/g, "<br><br>");
+      html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      html = html.replace(/^### (.*$)/gm, "<h3>$1</h3>");
+      html = html.replace(/^## (.*$)/gm, "<h2>$1</h2>");
+      html = html.replace(/^# (.*$)/gm, "<h1>$1</h1>");
+      html = html.replace(/^\s*[\*\-]\s+(.*$)/gm, "<li>$1</li>");
+      html = html.replace(/\n\n+/g, "<br><br>");
       return html;
     }
 
