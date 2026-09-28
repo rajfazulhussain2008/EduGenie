@@ -40,7 +40,11 @@ templates = Jinja2Templates(directory="templates")
 # Root endpoint - serves UI
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return templates.TemplateResponse(request=request, name="index.html")
+    response = templates.TemplateResponse(request=request, name="index.html")
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 # Q&A - GET API using Gemini
 @app.get("/qa")
