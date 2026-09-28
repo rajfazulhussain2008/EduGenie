@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- KaTeX for LaTeX Math & Chemistry Equations -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
 </head>
 <body>
 
@@ -201,6 +203,7 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       // 1. Prevent native submission on all forms
@@ -512,13 +515,14 @@
         const qNum = qIdx + 1;
         html += `
           <div class="quiz-card" id="quiz-card-${qIdx}">
-            <div class="quiz-question-header">Q${qNum}: ${escapeHtml(q.question)}</div>
+            <div class="quiz-question-header">Q${qNum}: ${escapeHtml(formatInlineMath(q.question))}</div>
             <div class="quiz-options-list">
         `;
 
         (q.options || []).forEach((opt, optIdx) => {
           const optId = `q${qIdx}_opt${optIdx}`;
-          const safeOpt = escapeHtml(opt);
+          const formattedOpt = formatInlineMath(opt);
+          const safeOpt = escapeHtml(formattedOpt);
           html += `
             <label class="quiz-option-label" for="${optId}">
               <input type="radio" id="${optId}" name="question_${qIdx}" value="${safeOpt}">
@@ -616,17 +620,96 @@
     function formatMarkdown(text) {
       if (!text) return "";
 
-      let cleaned = text.replace(/\$\$\\text\{([^}]+)\}\$\$/g, '`$1`');
-      cleaned = cleaned.replace(/\$\$([^$]+)\$\$/g, '`$1`');
+      const hasKatex = typeof katex !== "undefined" && typeof katex.renderToString === "function";
+      const mathTokens = [];
 
+      let prepared = text;
+
+      // 1. Extract and protect display math $$...$$
+      prepared = prepared.replace(/\$\$([\s\S]+?)\$\$/g, (match, formula) => {
+        if (hasKatex) {
+          mathTokens.push({ formula: formula.trim(), display: true });
+          return `%%KATEX_MATH_${mathTokens.length - 1}%%`;
+        }
+        return `\n\n> **Equation:** ${cleanLatexFallback(formula)}\n\n`;
+      });
+
+      // 2. Extract and protect inline math $...$ (like $\text{Fe}$, $\text{O}_2$, $x^2$)
+      prepared = prepared.replace(/\$([^\$\n]+?)\$/g, (match, formula) => {
+        if (hasKatex) {
+          mathTokens.push({ formula: formula.trim(), display: false });
+          return `%%KATEX_MATH_${mathTokens.length - 1}%%`;
+        }
+        return cleanLatexFallback(formula);
+      });
+
+      // 3. Clean any naked \text{...} outside math delimiters
+      prepared = prepared.replace(/\\text\{([^}]+)\}/g, "$1");
+
+      // 4. Render Markdown via marked.js
+      let html = "";
       if (typeof marked !== "undefined" && typeof marked.parse === "function") {
         try {
-          return marked.parse(cleaned);
+          html = marked.parse(prepared);
         } catch (err) {
           console.warn("marked.parse error, falling back:", err);
+          html = parseSimpleMarkdown(prepared);
         }
+      } else {
+        html = parseSimpleMarkdown(prepared);
       }
-      return parseSimpleMarkdown(cleaned);
+
+      // 5. Replace protected math tokens with KaTeX rendered HTML or fallback
+      if (mathTokens.length > 0) {
+        html = html.replace(/%%KATEX_MATH_(\d+)%%/g, (match, idx) => {
+          const item = mathTokens[parseInt(idx, 10)];
+          if (!item) return "";
+          if (hasKatex) {
+            try {
+              return katex.renderToString(item.formula, {
+                displayMode: item.display,
+                throwOnError: false
+              });
+            } catch (err) {
+              console.warn("KaTeX render error:", item.formula, err);
+            }
+          }
+          return cleanLatexFallback(item.formula);
+        });
+      }
+
+      return html;
+    }
+
+    function cleanLatexFallback(tex) {
+      if (!tex) return "";
+      return tex
+        .replace(/\\text\{([^}]+)\}/g, "$1")
+        .replace(/\\rightarrow/g, " → ")
+        .replace(/\\leftarrow/g, " ← ")
+        .replace(/\\leftrightarrow/g, " ↔ ")
+        .replace(/\\cdot/g, " · ")
+        .replace(/\\times/g, " × ")
+        .replace(/\\pm/g, " ± ")
+        .replace(/\\le/g, " ≤ ")
+        .replace(/\\ge/g, " ≥ ")
+        .replace(/\\ne/g, " ≠ ")
+        .replace(/\\approx/g, " ≈ ")
+        .replace(/\\Delta/g, "Δ")
+        .replace(/\\alpha/g, "α")
+        .replace(/\\beta/g, "β")
+        .replace(/\\pi/g, "π")
+        .replace(/\\theta/g, "θ")
+        .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, "($1 / $2)")
+        .replace(/\^\{([^}]+)\}/g, "^$1")
+        .replace(/_\{([^}]+)\}/g, "$1");
+    }
+
+    function formatInlineMath(str) {
+      if (!str) return "";
+      return cleanLatexFallback(
+        str.replace(/\$([^\$\n]+?)\$/g, "$1")
+      );
     }
 
     function parseSimpleMarkdown(md) {
